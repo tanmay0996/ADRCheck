@@ -1,4 +1,5 @@
 import React from 'react';
+import { MessageSquare, Share2, ThumbsUp, Twitter, Facebook, MessageCircle, ArrowUpRight } from 'lucide-react';
 
 interface Engagement {
   likes: number;
@@ -82,39 +83,72 @@ const SocialUpdates: React.FC<SocialUpdatesProps> = ({ drug }) => {
         }
       ];
 
+  const getPlatformIcon = (platform: string) => {
+    switch (platform.toLowerCase()) {
+      case 'twitter':
+        return <Twitter className="h-4 w-4" />;
+      case 'facebook':
+        return <Facebook className="h-4 w-4" />;
+      default:
+        return <MessageCircle className="h-4 w-4" />;
+    }
+  };
+
   return (
-    <div className="bg-[#0A0A0A] border border-[#666666]/20 rounded-xl p-5 shadow-sm">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">Social Media Updates</h2>
-        <button className="text-sm text-blue-400 hover:text-blue-300">View All</button>
+    <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl p-8 shadow-xl transition-all duration-300 hover:shadow-2xl hover:border-slate-600 animate-fade-in">
+      <div className="flex justify-between items-center mb-8">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-lg bg-purple-500/10">
+            <MessageSquare className="h-6 w-6 text-purple-400" />
+          </div>
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
+            Social Updates
+          </h2>
+        </div>
+        <button className="flex items-center gap-2 text-sm text-purple-400 hover:text-purple-300 transition-colors">
+          View All
+          <ArrowUpRight className="h-4 w-4" />
+        </button>
       </div>
 
       <div className="space-y-4">
         {socialUpdates.map((update, index) => (
           <div
             key={index}
-            className="border border-[#666666]/20 rounded-lg p-3 hover:bg-[#666666]/5 transition-colors"
+            className="bg-slate-700/30 rounded-xl p-4 transition-all duration-300 hover:transform hover:scale-[1.02] animate-fade-in"
+            style={{ animationDelay: `${index * 100}ms` }}
           >
-            <div className="flex justify-between items-center mb-2">
-              <div className="flex items-center space-x-2">
+            <div className="flex justify-between items-center mb-3">
+              <div className="flex items-center gap-2">
                 <div
-                  className={`w-2 h-2 rounded-full ${
+                  className={`p-1.5 rounded-lg ${
                     update.sentiment === 'positive'
-                      ? 'bg-green-500'
+                      ? 'bg-emerald-500/10 text-emerald-400'
                       : update.sentiment === 'negative'
-                      ? 'bg-red-500'
-                      : 'bg-yellow-500'
+                      ? 'bg-rose-500/10 text-rose-400'
+                      : 'bg-amber-500/10 text-amber-400'
                   }`}
-                ></div>
-                <span className="font-medium">{update.platform}</span>
+                >
+                  {getPlatformIcon(update.platform)}
+                </div>
+                <span className="font-medium text-white">{update.platform}</span>
               </div>
-              <span className="text-xs text-[#666666]">{update.date}</span>
+              <span className="text-xs text-slate-400">{update.date}</span>
             </div>
-            <p className="text-sm mb-3">{update.content}</p>
-            <div className="flex space-x-4 text-xs text-[#666666]">
-              <span>👍 {update.engagement.likes}</span>
-              <span>💬 {update.engagement.comments}</span>
-              <span>🔄 {update.engagement.shares}</span>
+            <p className="text-sm text-slate-300 mb-3 leading-relaxed">{update.content}</p>
+            <div className="flex gap-4 text-xs text-slate-400">
+              <div className="flex items-center gap-1">
+                <ThumbsUp className="h-3.5 w-3.5" />
+                <span>{update.engagement.likes}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <MessageSquare className="h-3.5 w-3.5" />
+                <span>{update.engagement.comments}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Share2 className="h-3.5 w-3.5" />
+                <span>{update.engagement.shares}</span>
+              </div>
             </div>
           </div>
         ))}
