@@ -5,10 +5,10 @@ import {
   FileText,
   Users,
   MessageCircle,
-  Pill,
-  X,
-  ChevronDown
+  Pill
 } from 'lucide-react';
+// import { GuestButton } from './GuestButton'; // Importing the Guest Button component
+import { GuestButton } from '@/components/GuestButton';
 
 /* Enhanced SplashScreen Component with Blinking Animation */
 function SplashScreen() {
@@ -19,72 +19,6 @@ function SplashScreen() {
         <h1 className="text-7xl font-extrabold text-white tracking-wide animate-blink">
           Medify
         </h1>
-      </div>
-    </div>
-  );
-}
-
-/* SignUpModal Component */
-interface SignUpModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  type: 'guest' | 'organisation' | null;
-}
-
-function SignUpModal({ isOpen, onClose, type }: SignUpModalProps) {
-  if (!isOpen) return null;
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
-      <div className="bg-gray-900 rounded-xl p-6 w-full max-w-md relative shadow-2xl">
-        <button
-          onClick={onClose}
-          className="absolute right-4 top-4 text-gray-400 hover:text-white transition-colors"
-        >
-          <X size={20} />
-        </button>
-        <h2 className="text-2xl font-bold mb-6">
-          {type === 'guest' ? 'Guest User Sign Up' : 'Organisation Sign Up'}
-        </h2>
-        <form className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">
-              Email
-            </label>
-            <input
-              type="email"
-              className="w-full bg-gray-800 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-blue-500 outline-none"
-              placeholder="Enter your email"
-            />
-          </div>
-          {type === 'organisation' && (
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">
-                Organization Name
-              </label>
-              <input
-                type="text"
-                className="w-full bg-gray-800 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-blue-500 outline-none"
-                placeholder="Enter organization name"
-              />
-            </div>
-          )}
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">
-              Password
-            </label>
-            <input
-              type="password"
-              className="w-full bg-gray-800 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-blue-500 outline-none"
-              placeholder="Enter your password"
-            />
-          </div>
-          <button
-            type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
-          >
-            Sign Up
-          </button>
-        </form>
       </div>
     </div>
   );
@@ -120,10 +54,6 @@ function FeatureCard({
 
 /* LandingPg Component (Main Landing Page) */
 function LandingPg() {
-  const [isSignUpOpen, setIsSignUpOpen] = useState(false);
-  const [signUpType, setSignUpType] = useState<'guest' | 'organisation' | null>(null);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
   const features = [
     {
       title: "Drug Composition",
@@ -155,12 +85,6 @@ function LandingPg() {
     }
   ];
 
-  const handleSignUpClick = (type: 'guest' | 'organisation') => {
-    setSignUpType(type);
-    setIsSignUpOpen(true);
-    setIsDropdownOpen(false);
-  };
-
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       {/* Navigation */}
@@ -171,30 +95,11 @@ function LandingPg() {
               <Pill className="text-blue-400" size={32} />
               <span className="text-xl font-bold">Medify</span>
             </div>
-            <div className="relative">
-              <button
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
-              >
-                <span>Sign Up</span>
-                <ChevronDown size={16} />
+            <div className="flex space-x-4">
+              <GuestButton /> {/* GuestButton imported above */}
+              <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+                Organisation
               </button>
-              {isDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-xl py-2 z-10">
-                  <button
-                    onClick={() => handleSignUpClick('guest')}
-                    className="block w-full text-left px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
-                  >
-                    Guest User
-                  </button>
-                  <button
-                    onClick={() => handleSignUpClick('organisation')}
-                    className="block w-full text-left px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
-                  >
-                    Organisation
-                  </button>
-                </div>
-              )}
             </div>
           </div>
         </div>
@@ -217,15 +122,6 @@ function LandingPg() {
           <p className="text-sm">Last updated: March 2025</p>
         </div>
       </div>
-
-      <SignUpModal
-        isOpen={isSignUpOpen}
-        onClose={() => {
-          setIsSignUpOpen(false);
-          setSignUpType(null);
-        }}
-        type={signUpType}
-      />
     </div>
   );
 }
