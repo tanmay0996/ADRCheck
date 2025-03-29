@@ -1,5 +1,5 @@
-"use client"
-import React, { useState } from 'react';
+"use client";
+import React, { useState, useEffect } from 'react';
 import {
   Beaker,
   FileText,
@@ -10,6 +10,21 @@ import {
   ChevronDown
 } from 'lucide-react';
 
+/* Enhanced SplashScreen Component with Blinking Animation */
+function SplashScreen() {
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-950 transition-all duration-500">
+      <div className="flex items-center space-x-4">
+        <Pill size={56} className="text-blue-400 animate-blink" />
+        <h1 className="text-7xl font-extrabold text-white tracking-wide animate-blink">
+          Medify
+        </h1>
+      </div>
+    </div>
+  );
+}
+
+/* SignUpModal Component */
 interface SignUpModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -18,13 +33,12 @@ interface SignUpModalProps {
 
 function SignUpModal({ isOpen, onClose, type }: SignUpModalProps) {
   if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-gray-900 rounded-xl p-6 w-full max-w-md relative">
+    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+      <div className="bg-gray-900 rounded-xl p-6 w-full max-w-md relative shadow-2xl">
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 text-gray-400 hover:text-white"
+          className="absolute right-4 top-4 text-gray-400 hover:text-white transition-colors"
         >
           <X size={20} />
         </button>
@@ -76,6 +90,7 @@ function SignUpModal({ isOpen, onClose, type }: SignUpModalProps) {
   );
 }
 
+/* FeatureCard Component */
 function FeatureCard({ 
   title, 
   description, 
@@ -90,8 +105,8 @@ function FeatureCard({
   accentColor: string;
 }) {
   return (
-    <div className={`bg-gray-900 rounded-xl p-6 shadow-xl border-t-4 ${accentColor} transition-transform hover:scale-[1.02]`}>
-      <div className="flex items-start justify-between mb-4">
+    <div className={`bg-gray-900 rounded-xl p-6 shadow-xl border-t-4 ${accentColor} transition-transform hover:scale-105`}>
+      <div className="flex items-center justify-between mb-4">
         <h3 className="text-xl font-bold text-white">{title}</h3>
         <Icon className="text-gray-400" size={24} />
       </div>
@@ -103,6 +118,7 @@ function FeatureCard({
   );
 }
 
+/* LandingPg Component (Main Landing Page) */
 function LandingPg() {
   const [isSignUpOpen, setIsSignUpOpen] = useState(false);
   const [signUpType, setSignUpType] = useState<'guest' | 'organisation' | null>(null);
@@ -152,10 +168,9 @@ function LandingPg() {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-2">
-              <Pill className="text-blue-500" size={28} />
+              <Pill className="text-blue-400" size={32} />
               <span className="text-xl font-bold">Medify</span>
             </div>
-            
             <div className="relative">
               <button
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -164,7 +179,6 @@ function LandingPg() {
                 <span>Sign Up</span>
                 <ChevronDown size={16} />
               </button>
-              
               {isDropdownOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-xl py-2 z-10">
                   <button
@@ -186,20 +200,19 @@ function LandingPg() {
         </div>
       </nav>
 
+      {/* Main Content */}
       <div className="container mx-auto px-4 py-12">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4">Drug Information Dashboard</h1>
           <p className="text-gray-400 max-w-2xl mx-auto">
-            Comprehensive insights into drug composition, regulatory status, patient outcomes, and social engagement
+            Comprehensive insights into drug composition, regulatory status, patient outcomes, and social engagement.
           </p>
         </div>
-
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-7xl mx-auto">
           {features.map((feature, index) => (
             <FeatureCard key={index} {...feature} />
           ))}
         </div>
-
         <div className="mt-12 text-center text-gray-400">
           <p className="text-sm">Last updated: March 2025</p>
         </div>
@@ -217,4 +230,16 @@ function LandingPg() {
   );
 }
 
-export default LandingPg;
+/* HomePage Component integrating SplashScreen and LandingPg */
+export default function HomePage() {
+  const [showSplash, setShowSplash] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowSplash(false);
+    }, 4000); // Display splash screen for 4 seconds
+    return () => clearTimeout(timer);
+  }, []);
+
+  return showSplash ? <SplashScreen /> : <LandingPg />;
+}
