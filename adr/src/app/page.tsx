@@ -7,8 +7,10 @@ import {
   MessageCircle,
   Pill
 } from 'lucide-react';
-// import { GuestButton } from './GuestButton'; // Importing the Guest Button component
+// import { GuestButton } from './GuestButton';
+// import { OrganisationButton } from './OrganisationButton';
 import { GuestButton } from '@/components/GuestButton';
+import { OrganisationButton } from '@/components/OrganisationButton';
 
 /* Enhanced SplashScreen Component with Blinking Animation */
 function SplashScreen() {
@@ -96,10 +98,8 @@ function LandingPg() {
               <span className="text-xl font-bold">Medify</span>
             </div>
             <div className="flex space-x-4">
-              <GuestButton /> {/* GuestButton imported above */}
-              <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
-                Organisation
-              </button>
+              <GuestButton />
+              <OrganisationButton />
             </div>
           </div>
         </div>
