@@ -7,10 +7,10 @@ import {
   MessageCircle,
   Pill
 } from 'lucide-react';
-// import { GuestButton } from './GuestButton'; // Importing the Guest Button component
 import { GuestButton } from '@/components/GuestButton';
+import { OrganisationButton } from '@/components/OrganisationButton';
 
-/* Enhanced SplashScreen Component with Blinking Animation */
+/* SplashScreen Component with Blinking Animation */
 function SplashScreen() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-950 transition-all duration-500">
@@ -24,7 +24,7 @@ function SplashScreen() {
   );
 }
 
-/* FeatureCard Component */
+/* FeatureCard Component with uniform height */
 function FeatureCard({ 
   title, 
   description, 
@@ -39,14 +39,18 @@ function FeatureCard({
   accentColor: string;
 }) {
   return (
-    <div className={`bg-gray-900 rounded-xl p-6 shadow-xl border-t-4 ${accentColor} transition-transform hover:scale-105`}>
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-xl font-bold text-white">{title}</h3>
-        <Icon className="text-gray-400" size={24} />
-      </div>
-      <p className="text-gray-400 mb-4">{description}</p>
-      <div className="bg-gray-800 p-4 rounded-lg">
-        <p className="text-gray-300 leading-relaxed text-sm">{summary}</p>
+    <div className={`bg-gray-900 rounded-xl p-6 shadow-xl border-t-4 ${accentColor} transition-transform hover:scale-105 h-full`}>
+      <div className="flex flex-col h-full">
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xl font-bold text-white">{title}</h3>
+            <Icon className="text-gray-400" size={24} />
+          </div>
+          <p className="text-gray-400 mb-4">{description}</p>
+        </div>
+        <div className="mt-auto bg-gray-800 p-4 rounded-lg">
+          <p className="text-gray-300 leading-relaxed text-sm">{summary}</p>
+        </div>
       </div>
     </div>
   );
@@ -85,6 +89,22 @@ function LandingPg() {
     }
   ];
 
+  // State to control how many cards are rendered
+  const [visibleCards, setVisibleCards] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setVisibleCards((prev) => {
+        if (prev < features.length) {
+          return prev + 1;
+        }
+        clearInterval(timer);
+        return prev;
+      });
+    }, 400); // Adjust delay as desired
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       {/* Navigation */}
@@ -96,10 +116,8 @@ function LandingPg() {
               <span className="text-xl font-bold">Medify</span>
             </div>
             <div className="flex space-x-4">
-              <GuestButton /> {/* GuestButton imported above */}
-              <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
-                Organisation
-              </button>
+              <GuestButton />
+              <OrganisationButton />
             </div>
           </div>
         </div>
@@ -114,9 +132,15 @@ function LandingPg() {
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-7xl mx-auto">
-          {features.map((feature, index) => (
-            <FeatureCard key={index} {...feature} />
-          ))}
+          {features.slice(0, visibleCards).map((feature, index) => {
+            // Choose the animation class based on index (even: left, odd: right)
+            const animationClass = index % 2 === 0 ? "animate-slide-in-left" : "animate-slide-in-right";
+            return (
+              <div key={index} className={animationClass}>
+                <FeatureCard {...feature} />
+              </div>
+            );
+          })}
         </div>
         <div className="mt-12 text-center text-gray-400">
           <p className="text-sm">Last updated: March 2025</p>
