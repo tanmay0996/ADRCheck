@@ -11,16 +11,18 @@ export async function GET(
 ) {
   try {
     await dbConnect();
+
+    const id = "67e8826c8105ad7fdbbbf060"
     
     // Validate hospital ID
-    if (!mongoose.Types.ObjectId.isValid(params.id)) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json(
         { success: false, error: 'Invalid hospital ID' },
         { status: 400 }
       );
     }
     
-    const hospital = await Hospital.findById(params.id).populate('patients');
+    const hospital = await Hospital.findById(id).populate('patients');
     
     if (!hospital) {
       return NextResponse.json(
@@ -46,10 +48,12 @@ export async function PUT(
 ) {
   try {
     await dbConnect();
+
+    const id = "67e8826c8105ad7fdbbbf060"
     const body = await request.json();
     
     // Validate hospital ID
-    if (!mongoose.Types.ObjectId.isValid(params.id)) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json(
         { success: false, error: 'Invalid hospital ID' },
         { status: 400 }
@@ -57,7 +61,7 @@ export async function PUT(
     }
     
     const updatedHospital = await Hospital.findByIdAndUpdate(
-      params.id,
+      id,
       { $set: body },
       { new: true, runValidators: true }
     );

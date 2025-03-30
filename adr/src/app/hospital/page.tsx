@@ -1,19 +1,59 @@
 'use client';
-import { redirect } from "next/navigation"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-// import { getHospital, getPatientStats } from "@/lib/data"
-import DashboardHeader from "@/components/dashboard-header"
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import DashboardHeader from "@/components/dashboard-header";
 
-export default async function DashboardPage() {
-  // const hospital = await getHospital()
+export default function DashboardPage() {
+  const router = useRouter();
+  const [hospital, setHospital] = useState<{ name: string }>({ name: "Default Hospital" });
+  const [stats, setStats] = useState({
+    totalPatients: 0,
+    activeAdmissions: 0,
+    checkupsToday: 0,
+    recentActivity: [],
+  });
 
-  // if (!hospital) {
-  //   redirect("/login")
-  // }
+  useEffect(() => {
+    async function fetchHospitalData() {
+      try {
+        const res = await fetch("/api/hospitals");
+        const data = await res.json();
 
-  // const stats = await getPatientStats()
+        if (!res.ok || !data.success || !data.data.length) {
+          // router.push("/login");
+          //mkc
+          return;
+        }
+
+        setHospital(data.data[0] || { name: "Unnamed Hospital" });
+      } catch (error) {
+        console.error("Failed to fetch hospital:", error);
+        router.push("/login");
+      }
+    }
+
+    async function fetchStats() {
+      try {
+        const res = await fetch("/api/patient-stats"); // Implement this API in your backend
+        const data = await res.json();
+
+        setStats({
+          totalPatients: data.totalPatients || 1,
+          activeAdmissions: data.activeAdmissions || 1,
+          checkupsToday: data.checkupsToday || 1,
+          recentActivity: data.recentActivity || [],
+        });
+      } catch (error) {
+        console.error("Failed to fetch stats:", error);
+      }
+    }
+
+    fetchHospitalData();
+    fetchStats();
+  }, []);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -76,8 +116,8 @@ export default async function DashboardPage() {
                 <ul className="space-y-2">
                   {stats.recentActivity.map((activity, index) => (
                     <li key={index} className="text-sm">
-                      <span className="font-medium">{activity.patientName}</span> - {activity.action} on{" "}
-                      {new Date(activity.date).toLocaleDateString()}
+                      <span className="font-medium">{activity.patientName || "Unknown"}</span> - {activity.action || "No Action"} on{" "}
+                      {new Date(activity.date || new Date()).toLocaleDateString()}
                     </li>
                   ))}
                 </ul>
@@ -89,6 +129,5 @@ export default async function DashboardPage() {
         </div>
       </main>
     </div>
-  )
+  );
 }
-
