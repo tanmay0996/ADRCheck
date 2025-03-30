@@ -1,14 +1,6 @@
 import React from 'react';
 import { FileText, AlertCircle, ArrowUpRight } from 'lucide-react';
 
-interface Drug {
-  name: string;
-}
-
-interface FDAReportsProps {
-  drug?: Drug;
-}
-
 interface Report {
   id: string;
   title: string;
@@ -18,7 +10,7 @@ interface Report {
   summary: string;
 }
 
-const FDAReports: React.FC<FDAReportsProps> = ({ drug }) => {
+const FDAReports = ({ drug }) => {
   const reports: Report[] = drug
     ? [
         {
