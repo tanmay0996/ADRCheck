@@ -21,49 +21,47 @@ interface Drug {
 }
 
 // Mock data for drug search
-const mockDrugs: Drug[] = [
-  {
-    id: 1,
-    name: 'Atorvastatin',
-    brandNames: ['Lipitor', 'Torvast'],
-    class: 'HMG-CoA reductase inhibitor (statin)',
-    indications: 'Hypercholesterolemia, Prevention of cardiovascular disease',
-    composition: [
-      { name: 'Atorvastatin Calcium', amount: '10-80mg', role: 'Active Ingredient' },
-      { name: 'Calcium Carbonate', amount: '10mg', role: 'Stabilizer' },
-      { name: 'Microcrystalline Cellulose', amount: '20mg', role: 'Binder' },
-      { name: 'Lactose Monohydrate', amount: '25mg', role: 'Diluent' },
-      { name: 'Croscarmellose Sodium', amount: '5mg', role: 'Disintegrant' },
-      { name: 'Magnesium Stearate', amount: '2mg', role: 'Lubricant' },
-      { name: 'Hydroxypropyl Cellulose', amount: '5mg', role: 'Coating agent' }
-    ]
-  },
-  {
-    id: 2,
-    name: 'Metformin',
-    brandNames: ['Glucophage', 'Fortamet'],
-    class: 'Biguanide',
-    indications: 'Type 2 Diabetes',
-    composition: [
-      { name: 'Metformin Hydrochloride', amount: '500-1000mg', role: 'Active Ingredient' },
-      { name: 'Povidone', amount: '15mg', role: 'Binder' },
-      { name: 'Magnesium Stearate', amount: '2mg', role: 'Lubricant' },
-      { name: 'Hypromellose', amount: '8mg', role: 'Coating agent' }
-    ]
-  }
-];
+// const mockDrugs: Drug[] = [
+//   {
+//     id: 1,
+//     name: 'Atorvastatin',
+//     brandNames: ['Lipitor', 'Torvast'],
+//     class: 'HMG-CoA reductase inhibitor (statin)',
+//     indications: 'Hypercholesterolemia, Prevention of cardiovascular disease',
+//     composition: [
+//       { name: 'Atorvastatin Calcium', amount: '10-80mg', role: 'Active Ingredient' },
+//       { name: 'Calcium Carbonate', amount: '10mg', role: 'Stabilizer' },
+//       { name: 'Microcrystalline Cellulose', amount: '20mg', role: 'Binder' },
+//       { name: 'Lactose Monohydrate', amount: '25mg', role: 'Diluent' },
+//       { name: 'Croscarmellose Sodium', amount: '5mg', role: 'Disintegrant' },
+//       { name: 'Magnesium Stearate', amount: '2mg', role: 'Lubricant' },
+//       { name: 'Hydroxypropyl Cellulose', amount: '5mg', role: 'Coating agent' }
+//     ]
+//   },
+//   {
+//     id: 2,
+//     name: 'Metformin',
+//     brandNames: ['Glucophage', 'Fortamet'],
+//     class: 'Biguanide',
+//     indications: 'Type 2 Diabetes',
+//     composition: [
+//       { name: 'Metformin Hydrochloride', amount: '500-1000mg', role: 'Active Ingredient' },
+//       { name: 'Povidone', amount: '15mg', role: 'Binder' },
+//       { name: 'Magnesium Stearate', amount: '2mg', role: 'Lubricant' },
+//       { name: 'Hypromellose', amount: '8mg', role: 'Coating agent' }
+//     ]
+//   }
+// ];
 
 const Dashboard: React.FC = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [activeDrug, setActiveDrug] = useState<Drug | null>(null);
+  const [selectedDrug, setSelectedDrug] = useState<string>(''); // Store entered drug
+  const [activeDrug, setActiveDrug] = useState<string | null>(null); // Store searched drug
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    const foundDrug = mockDrugs.find(drug =>
-      drug.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      drug.brandNames.some(brand => brand.toLowerCase().includes(searchQuery.toLowerCase()))
-    );
-    setActiveDrug(foundDrug || null);
+    if (selectedDrug.trim() !== '') {
+      setActiveDrug(selectedDrug.trim()); // Store the entered drug when searched
+    }
   };
 
   return (
@@ -84,9 +82,9 @@ const Dashboard: React.FC = () => {
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
               <input
                 type="text"
-                placeholder="Search by drug name or brand name..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Enter drug name..."
+                value={selectedDrug}
+                onChange={(e) => setSelectedDrug(e.target.value)}
                 className="w-full bg-slate-700/30 border border-slate-600 rounded-xl py-3 pl-12 pr-4 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40 transition-all duration-300"
               />
             </div>
@@ -99,7 +97,7 @@ const Dashboard: React.FC = () => {
           </form>
         </div>
 
-        {activeDrug ? (
+        {activeDrug && (
           <div className="space-y-8 animate-fade-in">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <DrugComposition drug={activeDrug} />
@@ -109,15 +107,6 @@ const Dashboard: React.FC = () => {
               <SocialUpdates drug={activeDrug} />
               <PatientData drug={activeDrug} />
             </div>
-          </div>
-        ) : searchQuery && (
-          <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl p-8 shadow-xl text-center animate-fade-in">
-            <p className="text-slate-300 text-lg">
-              No results found for "<span className="text-white font-medium">{searchQuery}</span>"
-            </p>
-            <p className="text-slate-400 mt-2">
-              Try searching for a different drug name or brand name
-            </p>
           </div>
         )}
       </div>

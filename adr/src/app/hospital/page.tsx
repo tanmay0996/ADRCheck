@@ -1,13 +1,18 @@
-'use client';
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import DashboardHeader from "@/components/dashboard-header";
+"use client"
+import React, { useState, useEffect } from 'react';
+import { 
+  Users, 
+  BedDouble, 
+  Stethoscope, 
+  Plus, 
+  List, 
+  Activity,
+  ArrowRight,
+  Calendar,
+  Bell
+} from 'lucide-react';
 
-export default function DashboardPage() {
-  const router = useRouter();
+function DashboardPage() {
   const [hospital, setHospital] = useState<{ name: string }>({ name: "Default Hospital" });
   const [stats, setStats] = useState({
     totalPatients: 0,
@@ -15,119 +20,181 @@ export default function DashboardPage() {
     checkupsToday: 0,
     recentActivity: [],
   });
+  const [hoveredCard, setHoveredCard] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchHospitalData() {
-      try {
-        const res = await fetch("/api/hospitals");
-        const data = await res.json();
-
-        if (!res.ok || !data.success || !data.data.length) {
-          // router.push("/login");
-          //mkc
-          return;
-        }
-
-        setHospital(data.data[0] || { name: "Unnamed Hospital" });
-      } catch (error) {
-        console.error("Failed to fetch hospital:", error);
-        router.push("/login");
-      }
-    }
-
-    async function fetchStats() {
-      try {
-        const res = await fetch("/api/patient-stats"); // Implement this API in your backend
-        const data = await res.json();
-
-        setStats({
-          totalPatients: data.totalPatients || 1,
-          activeAdmissions: data.activeAdmissions || 1,
-          checkupsToday: data.checkupsToday || 1,
-          recentActivity: data.recentActivity || [],
-        });
-      } catch (error) {
-        console.error("Failed to fetch stats:", error);
-      }
-    }
-
-    fetchHospitalData();
-    fetchStats();
+    // Simulated data fetch
+    setStats({
+      totalPatients: 1234,
+      activeAdmissions: 42,
+      checkupsToday: 8,
+      recentActivity: [
+        { patientName: "John Doe", action: "Admitted", date: new Date().toISOString() },
+        { patientName: "Jane Smith", action: "Checkup", date: new Date().toISOString() },
+        { patientName: "Mike Johnson", action: "Discharged", date: new Date().toISOString() },
+      ]
+    });
   }, []);
 
+  const StatCard = ({ 
+    title, 
+    value, 
+    icon: Icon, 
+    borderColor, 
+    id 
+  }: { 
+    title: string;
+    value: number;
+    icon: React.ElementType;
+    borderColor: string;
+    id: string;
+  }) => (
+    <div
+      className={`bg-gray-900 rounded-xl p-6 border-t-4 ${borderColor} transform transition-all duration-300 hover:scale-[1.02] cursor-pointer`}
+      onMouseEnter={() => setHoveredCard(id)}
+      onMouseLeave={() => setHoveredCard(null)}
+    >
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="text-gray-400 text-sm mb-1">{title}</p>
+          <h3 className="text-3xl font-bold text-white">{value.toLocaleString()}</h3>
+        </div>
+        <div className={`p-3 rounded-lg bg-opacity-20 ${borderColor.replace('border', 'bg')}`}>
+          <Icon className={`w-6 h-6 ${borderColor.replace('border', 'text').replace('-500', '-400')}`} />
+        </div>
+      </div>
+      <div className={`mt-4 h-1 rounded-full bg-gray-800 overflow-hidden transition-all duration-500 ${hoveredCard === id ? 'opacity-100' : 'opacity-0'}`}>
+        <div className={`h-full ${borderColor.replace('border', 'bg')} animate-pulse`} style={{ width: '60%' }}></div>
+      </div>
+    </div>
+  );
+
+  const ActionCard = ({ 
+    title, 
+    description, 
+    primaryAction, 
+    secondaryAction, 
+    borderColor 
+  }: { 
+    title: string;
+    description: string;
+    primaryAction: string;
+    secondaryAction: string;
+    borderColor: string;
+  }) => (
+    <div className={`bg-gray-900 rounded-xl p-6 border-t-4 ${borderColor}`}>
+      <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
+      <p className="text-gray-400 text-sm mb-6">{description}</p>
+      <div className="space-y-3">
+        <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2 group">
+          <Plus size={18} />
+          <span>{primaryAction}</span>
+          <ArrowRight size={18} className="opacity-0 group-hover:opacity-100 transform translate-x-[-10px] group-hover:translate-x-0 transition-all" />
+        </button>
+        <button className="w-full bg-gray-800 hover:bg-gray-750 text-white font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2">
+          <List size={18} />
+          <span>{secondaryAction}</span>
+        </button>
+      </div>
+    </div>
+  );
+
   return (
-    <div className="flex min-h-screen flex-col">
-      <DashboardHeader hospitalName={hospital.name} />
-      <main className="flex-1 container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gray-950 text-white">
+      {/* Header */}
+      <header className="bg-gray-900 border-b border-gray-800">
+        <div className="container mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold">{hospital.name}</h1>
+              <p className="text-gray-400 text-sm">Healthcare Dashboard</p>
+            </div>
+            <div className="flex items-center space-x-4">
+              <button className="p-2 hover:bg-gray-800 rounded-lg transition-colors relative">
+                <Bell size={20} className="text-gray-400" />
+                <span className="absolute top-1 right-1 w-2 h-2 bg-blue-500 rounded-full"></span>
+              </button>
+              <button className="bg-gray-800 hover:bg-gray-750 text-white px-4 py-2 rounded-lg transition-colors flex items-center space-x-2">
+                <Calendar size={18} />
+                <span>Schedule</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="container mx-auto px-6 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Dashboard</h1>
-          <p className="text-muted-foreground">Welcome back, {hospital.name}. Manage your patient records here.</p>
+          <h2 className="text-3xl font-bold mb-2">Welcome back!</h2>
+          <p className="text-gray-400">Here's what's happening at {hospital.name} today.</p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-3 mb-8">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">Total Patients</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">{stats.totalPatients}</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">Active Admissions</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">{stats.activeAdmissions}</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">Checkups Today</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">{stats.checkupsToday}</div>
-            </CardContent>
-          </Card>
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <StatCard
+            title="Total Patients"
+            value={stats.totalPatients}
+            icon={Users}
+            borderColor="border-blue-500"
+            id="patients"
+          />
+          <StatCard
+            title="Active Admissions"
+            value={stats.activeAdmissions}
+            icon={BedDouble}
+            borderColor="border-rose-500"
+            id="admissions"
+          />
+          <StatCard
+            title="Checkups Today"
+            value={stats.checkupsToday}
+            icon={Stethoscope}
+            borderColor="border-emerald-500"
+            id="checkups"
+          />
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>Patient Management</CardTitle>
-              <CardDescription>Add and manage patient records</CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-4">
-              <Button asChild>
-                <Link href="/patients/new">Add New Patient</Link>
-              </Button>
-              <Button asChild variant="outline">
-                <Link href="/patients">View All Patients</Link>
-              </Button>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Activity</CardTitle>
-              <CardDescription>Recent patient admissions and checkups</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {stats.recentActivity.length > 0 ? (
-                <ul className="space-y-2">
-                  {stats.recentActivity.map((activity, index) => (
-                    <li key={index} className="text-sm">
-                      <span className="font-medium">{activity.patientName || "Unknown"}</span> - {activity.action || "No Action"} on{" "}
-                      {new Date(activity.date || new Date()).toLocaleDateString()}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-sm text-muted-foreground">No recent activity</p>
-              )}
-            </CardContent>
-          </Card>
+        {/* Action Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <ActionCard
+            title="Patient Management"
+            description="Add and manage patient records efficiently"
+            primaryAction="Add New Patient"
+            secondaryAction="View All Patients"
+            borderColor="border-purple-500"
+          />
+
+          <div className="bg-gray-900 rounded-xl p-6 border-t-4 border-blue-500">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className="text-xl font-bold text-white">Recent Activity</h3>
+                <p className="text-gray-400 text-sm">Latest updates and changes</p>
+              </div>
+              <Activity size={20} className="text-blue-400" />
+            </div>
+            
+            <div className="space-y-4">
+              {stats.recentActivity.map((activity, index) => (
+                <div
+                  key={index}
+                  className="p-4 bg-gray-800 rounded-lg hover:bg-gray-750 transition-colors cursor-pointer"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium text-white">{activity.patientName}</span>
+                    <span className="text-sm text-gray-400">
+                      {new Date(activity.date).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-400 mt-1">{activity.action}</p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </main>
     </div>
   );
 }
+
+export default DashboardPage;
