@@ -120,7 +120,7 @@ export function GuestPatientForm({ onClose, hospitalId }: GuestPatientFormProps)
   };
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-start justify-center pt-10 z-50 overflow-y-auto pb-10">
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center min-h-screen z-50 overflow-y-auto">
       <div className="bg-gray-900 rounded-xl p-8 w-full max-w-lg relative shadow-2xl border border-gray-800">
         <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-blue-500 rounded-full p-4 shadow-xl border-4 border-gray-900">
           <FileText size={32} className="text-white" />

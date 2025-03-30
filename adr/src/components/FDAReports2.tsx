@@ -1,5 +1,5 @@
-"use client"
-import { useState } from 'react';
+"use client";
+import React, { useState } from 'react';
 import { 
   Pill, 
   Search, 
@@ -11,11 +11,134 @@ import {
   Activity, 
   Timer,
   ChevronDown,
-  ChevronUp,
   Clock,
-  XCircle
+  XCircle,
+  X,
+  Heart
 } from 'lucide-react';
 
+// --------------------- PatientData Component ---------------------
+interface PatientDataProps {
+  drug?: any;
+}
+
+const PatientData: React.FC<PatientDataProps> = ({ drug }) => {
+  const patientData = drug
+    ? {
+        totalPatients: 12845,
+        avgAge: 64,
+        genderDistribution: { male: 42, female: 58 },
+        commonSideEffects: [
+          { name: 'Muscle Pain', percentage: 12 },
+          { name: 'Headache', percentage: 8 },
+          { name: 'Dizziness', percentage: 6 },
+          { name: 'Nausea', percentage: 5 },
+          { name: 'Fatigue', percentage: 4 }
+        ],
+        adherenceRate: 76,
+        averageRating: 3.8,
+        effectivenessRating: 4.2
+      }
+    : null;
+
+  if (!patientData) {
+    return (
+      <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl p-4 shadow-md transition-all duration-300 hover:shadow-lg hover:border-slate-600 animate-scale-in my-8">
+        <div className="text-center">
+          <p className="text-slate-400 text-base mb-4">Search for a medication to view patient data</p>
+          <div className="inline-block p-2 rounded-full bg-slate-700/30">
+            <Pill className="h-6 w-6 text-slate-400" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl p-4 shadow-md transition-all duration-300 hover:shadow-lg hover:border-slate-600 animate-fade-in my-8">
+      <div className="flex justify-between items-center mb-4">
+        <div className="flex items-center gap-2">
+          <div className="p-1 rounded-lg bg-blue-500/10">
+            <Activity className="h-5 w-5 text-blue-400" />
+          </div>
+          <h2 className="text-xl font-bold bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
+            Patient Data
+          </h2>
+        </div>
+        <div className="flex items-center gap-1 bg-blue-500/10 px-3 py-1 rounded-full">
+          <Pill className="h-4 w-4 text-blue-400" />
+          <span className="text-blue-400 font-bold">{patientData.totalPatients.toLocaleString()}</span>
+          <span className="text-slate-400 text-xs">patients</span>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-4 mb-4">
+        <div className="bg-slate-700/30 rounded-xl p-3 transition-all duration-300 hover:scale-105">
+          <div className="flex items-center gap-1 mb-1">
+            <Clock className="h-3 w-3 text-emerald-400" />
+            <p className="text-slate-400 text-xs">Average Age</p>
+          </div>
+          <p className="text-xl font-bold text-white">{patientData.avgAge}</p>
+        </div>
+        <div className="bg-slate-700/30 rounded-xl p-3 transition-all duration-300 hover:scale-105">
+          <div className="flex items-center gap-1 mb-1">
+            <Stethoscope className="h-3 w-3 text-purple-400" />
+            <p className="text-slate-400 text-xs">Adherence Rate</p>
+          </div>
+          <p className="text-xl font-bold text-white">{patientData.adherenceRate}%</p>
+        </div>
+        <div className="bg-slate-700/30 rounded-xl p-3 transition-all duration-300 hover:scale-105">
+          <div className="flex items-center gap-1 mb-1">
+            <Heart className="h-3 w-3 text-rose-400" />
+            <p className="text-slate-400 text-xs">Effectiveness</p>
+          </div>
+          <p className="text-xl font-bold text-white">{patientData.effectivenessRating}</p>
+        </div>
+      </div>
+
+      <div className="mb-4">
+        <h3 className="text-base font-semibold text-white mb-2">Gender Distribution</h3>
+        <div className="h-3 rounded-full bg-slate-700/30 overflow-hidden">
+          <div
+            className="h-full bg-gradient-to-r from-blue-500 to-blue-400 transition-all duration-300"
+            style={{ width: `${patientData.genderDistribution.male}%` }}
+          ></div>
+        </div>
+        <div className="flex justify-between text-xs mt-1">
+          <span className="text-blue-400">Male: {patientData.genderDistribution.male}%</span>
+          <span className="text-purple-400">Female: {patientData.genderDistribution.female}%</span>
+        </div>
+      </div>
+
+      <div>
+        <div className="flex items-center gap-1 mb-2">
+          <AlertCircle className="h-4 w-4 text-rose-400" />
+          <h3 className="text-base font-semibold text-white">Common Side Effects</h3>
+        </div>
+        <div className="space-y-2">
+          {patientData.commonSideEffects.map((effect, index) => (
+            <div key={index} className="animate-fade-in" style={{ animationDelay: `${index * 100}ms` }}>
+              <div className="flex justify-between text-xs mb-1">
+                <span className="text-slate-300">{effect.name}</span>
+                <span className="text-slate-400">{effect.percentage}%</span>
+              </div>
+              <div className="h-2 rounded-full bg-slate-700/30 overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-rose-500 to-rose-400 transition-all duration-300 hover:from-rose-400 hover:to-rose-300"
+                  style={{ width: `${effect.percentage}%` }}
+                ></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// --------------------- End PatientData Component ---------------------
+
+// FDAResult and related interfaces
 interface FDAResult {
   openfda?: {
     brand_name?: string[];
@@ -56,40 +179,63 @@ interface ExpandableTextProps {
 }
 
 function ExpandableText({ text, className = '' }: ExpandableTextProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  // We'll consider text long if the joined text is over 200 characters
   const shouldTruncate = text.join(' ').length > 200;
 
   return (
     <div className={`space-y-2 text-gray-300 ${className}`}>
-      {shouldTruncate && !isExpanded ? (
+      {shouldTruncate ? (
         <>
           <p className="text-sm">
             {text[0].slice(0, 200)}...
           </p>
           <button
-            onClick={() => setIsExpanded(true)}
+            onClick={() => setIsModalOpen(true)}
             className="flex items-center space-x-1 text-blue-400 hover:text-blue-300 transition-colors text-sm mt-2"
           >
-            <span>Show More</span>
+            <span>Read More</span>
             <ChevronDown size={16} />
           </button>
-        </>
-      ) : (
-        <>
-          {text.map((item, idx) => (
-            <p key={idx} className="text-sm">{item}</p>
-          ))}
-          {shouldTruncate && (
-            <button
-              onClick={() => setIsExpanded(false)}
-              className="flex items-center space-x-1 text-blue-400 hover:text-blue-300 transition-colors text-sm mt-2"
-            >
-              <span>Show Less</span>
-              <ChevronUp size={16} />
-            </button>
+          {isModalOpen && (
+            <Modal onClose={() => setIsModalOpen(false)}>
+              <div className="p-6">
+                <h3 className="text-xl font-bold mb-4">Full Text</h3>
+                <div className="space-y-2 text-gray-300">
+                  {text.map((item, idx) => (
+                    <p key={idx} className="text-sm">{item}</p>
+                  ))}
+                </div>
+              </div>
+            </Modal>
           )}
         </>
+      ) : (
+        text.map((item, idx) => (
+          <p key={idx} className="text-sm">{item}</p>
+        ))
       )}
+    </div>
+  );
+}
+
+interface ModalProps {
+  onClose: () => void;
+  children: React.ReactNode;
+}
+
+function Modal({ onClose, children }: ModalProps) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+      <div className="bg-gray-900 rounded-lg shadow-xl max-w-3xl w-full relative">
+        <button 
+          onClick={onClose} 
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-200 transition-colors"
+        >
+          <X size={24} />
+        </button>
+        {children}
+      </div>
     </div>
   );
 }
@@ -99,9 +245,11 @@ function App() {
   const [reports, setReports] = useState<FDAResult[]>([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [searched, setSearched] = useState(false); // state to track search
 
   const fetchFDAReport = async () => {
     if (!drug) return;
+    setSearched(true); // mark that a search has been initiated
     setLoading(true);
     setError('');
     try {
@@ -169,14 +317,6 @@ function App() {
             </button>
           </div>
         </div>
-
-        {/* Error Message */}
-        {error && (
-          <div className="max-w-2xl mx-auto mb-8 p-4 bg-red-900/50 border border-red-700 rounded-lg flex items-center space-x-3">
-            <AlertCircle className="text-red-400" size={24} />
-            <p className="text-red-400">{error}</p>
-          </div>
-        )}
 
         {/* Results Grid */}
         {reports.length > 0 && reports.map((report, reportIndex) => (
@@ -270,6 +410,14 @@ function App() {
             </div>
           </div>
         ))}
+
+        {/* Render Patient Data Component only after a search */}
+        {searched && (
+          <div className="max-w-2xl mx-auto">
+            <PatientData drug={drug} />
+          </div>
+        )}
+
       </div>
     </div>
   );

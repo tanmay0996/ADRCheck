@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import {
   Beaker,
   FileText,
@@ -118,6 +119,11 @@ function LandingPg() {
             <div className="flex space-x-4">
               <GuestButton />
               <OrganisationButton />
+              <Link href="/fda-report" passHref>
+                <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors">
+                  Search Drugs
+                </button>
+              </Link>
             </div>
           </div>
         </div>
