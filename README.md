@@ -41,5 +41,5 @@ Medify is an advanced AI-powered platform for the early and accurate detection o
 We welcome open-source contributions! Feel free to submit issues, feature requests, or pull requests to help improve Medify.
 
 ## License
-This project is licensed under the [MIT License]().
+This project is licensed under the [MIT License](LICENSE).
 
