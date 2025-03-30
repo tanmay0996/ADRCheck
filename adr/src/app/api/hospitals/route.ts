@@ -2,12 +2,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import Hospital from '@/models/Hospital';
+import Patient from '@/models/Patient';
 
 // GET /api/hospitals - Get all hospitals
 export async function GET() {
   try {
     await dbConnect();
-    const hospitals = await Hospital.find({}).populate('patients', 'name age');
+
+    const hospitals = await Hospital.find({})
+    .populate({ path: 'patients', select: 'name age' });
     
     return NextResponse.json({ success: true, data: hospitals }, { status: 200 });
   } catch (error) {
