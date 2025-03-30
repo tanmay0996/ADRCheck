@@ -5,6 +5,16 @@ interface GuestPatientFormProps {
   onClose: () => void;
 }
 
+interface PatientFormData {
+  patientId: string;
+  hospitalId: string;
+  fullName: string;
+  age: string;
+  medications: Record<string, string>;
+  symptoms: string;
+  conditions: string;
+}
+
 export function GuestPatientForm({ onClose }: GuestPatientFormProps) {
   const [expandedSections, setExpandedSections] = useState({
     medications: false,
@@ -12,11 +22,75 @@ export function GuestPatientForm({ onClose }: GuestPatientFormProps) {
     conditions: false
   });
 
+  const [formData, setFormData] = useState<PatientFormData>({
+    patientId: '',
+    hospitalId: '',
+    fullName: '',
+    age: '',
+    medications: {},
+    symptoms: '',
+    conditions: ''
+  });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
   const toggleSection = (section: keyof typeof expandedSections) => {
     setExpandedSections(prev => ({
       ...prev,
       [section]: !prev[section]
     }));
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleMedicationChange = (label: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      medications: {
+        ...prev.medications,
+        [label]: value
+      }
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      // Replace with your actual API endpoint
+      const response = await fetch('/api/patient-data', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Server responded with status: ${response.status}`);
+      }
+
+      // Handle successful submission
+      const data = await response.json();
+      console.log('Submission successful:', data);
+      
+      // Close the form after successful submission
+      onClose();
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      setSubmitError(error instanceof Error ? error.message : 'Failed to submit form');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const medicationLabels = [
@@ -32,7 +106,7 @@ export function GuestPatientForm({ onClose }: GuestPatientFormProps) {
     "following",
     "subsequent to"
   ];
-
+  
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-start justify-center pt-10 z-50 overflow-y-auto pb-10">
       <div className="bg-gray-900 rounded-xl p-8 w-full max-w-lg relative shadow-2xl border border-gray-800">
@@ -52,7 +126,7 @@ export function GuestPatientForm({ onClose }: GuestPatientFormProps) {
           <p className="text-gray-400 text-center mb-8">Please fill in the patient details below</p>
         </div>
 
-        <form className="space-y-6">
+        <form className="space-y-6" onSubmit={handleSubmit}>
           {/* Basic Information Section */}
           <div className="space-y-4">
             <div className="relative">
@@ -61,6 +135,9 @@ export function GuestPatientForm({ onClose }: GuestPatientFormProps) {
               </div>
               <input
                 type="text"
+                name="patientId"
+                value={formData.patientId}
+                onChange={handleInputChange}
                 className="w-full bg-gray-800 rounded-lg pl-10 pr-4 py-3 text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-200 border border-gray-700 hover:border-gray-600"
                 placeholder="Patient ID"
               />
@@ -72,6 +149,9 @@ export function GuestPatientForm({ onClose }: GuestPatientFormProps) {
               </div>
               <input
                 type="text"
+                name="hospitalId"
+                value={formData.hospitalId}
+                onChange={handleInputChange}
                 className="w-full bg-gray-800 rounded-lg pl-10 pr-4 py-3 text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-200 border border-gray-700 hover:border-gray-600"
                 placeholder="Hospital ID"
               />
@@ -83,6 +163,9 @@ export function GuestPatientForm({ onClose }: GuestPatientFormProps) {
               </div>
               <input
                 type="text"
+                name="fullName"
+                value={formData.fullName}
+                onChange={handleInputChange}
                 className="w-full bg-gray-800 rounded-lg pl-10 pr-4 py-3 text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-200 border border-gray-700 hover:border-gray-600"
                 placeholder="Full Name"
               />
@@ -94,6 +177,9 @@ export function GuestPatientForm({ onClose }: GuestPatientFormProps) {
               </div>
               <input
                 type="number"
+                name="age"
+                value={formData.age}
+                onChange={handleInputChange}
                 className="w-full bg-gray-800 rounded-lg pl-10 pr-4 py-3 text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-200 border border-gray-700 hover:border-gray-600"
                 placeholder="Age"
               />
@@ -120,6 +206,8 @@ export function GuestPatientForm({ onClose }: GuestPatientFormProps) {
                   <div key={label} className="relative">
                     <input
                       type="text"
+                      value={formData.medications[label] || ''}
+                      onChange={(e) => handleMedicationChange(label, e.target.value)}
                       className="w-full bg-gray-800 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-200 border border-gray-700 hover:border-gray-600"
                       placeholder={`${label} {med}`}
                     />
@@ -151,6 +239,9 @@ export function GuestPatientForm({ onClose }: GuestPatientFormProps) {
                   </div>
                   <input
                     type="text"
+                    name="symptoms"
+                    value={formData.symptoms}
+                    onChange={handleInputChange}
                     className="w-full bg-gray-800 rounded-lg pl-10 pr-4 py-3 text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-200 border border-gray-700 hover:border-gray-600"
                     placeholder="experiencing {symptom}"
                   />
@@ -181,6 +272,9 @@ export function GuestPatientForm({ onClose }: GuestPatientFormProps) {
                   </div>
                   <input
                     type="text"
+                    name="conditions"
+                    value={formData.conditions}
+                    onChange={handleInputChange}
                     className="w-full bg-gray-800 rounded-lg pl-10 pr-4 py-3 text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-200 border border-gray-700 hover:border-gray-600"
                     placeholder="suffering from {condition}"
                   />
@@ -189,12 +283,31 @@ export function GuestPatientForm({ onClose }: GuestPatientFormProps) {
             )}
           </div>
 
+          {submitError && (
+            <div className="bg-red-500/20 border border-red-500 text-red-300 p-3 rounded-lg">
+              <p className="text-sm">{submitError}</p>
+            </div>
+          )}
+
           <button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors mt-6 flex items-center justify-center space-x-2"
+            disabled={isSubmitting}
+            className={`w-full ${isSubmitting ? 'bg-blue-800' : 'bg-blue-600 hover:bg-blue-700'} text-white font-semibold py-3 px-4 rounded-lg transition-colors mt-6 flex items-center justify-center space-x-2`}
           >
-            <FileText size={18} />
-            <span>Submit Patient Information</span>
+            {isSubmitting ? (
+              <>
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Submitting...</span>
+              </>
+            ) : (
+              <>
+                <FileText size={18} />
+                <span>Submit Patient Information</span>
+              </>
+            )}
           </button>
         </form>
       </div>
