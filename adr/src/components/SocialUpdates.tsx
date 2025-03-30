@@ -23,15 +23,9 @@ interface SocialUpdate {
   sentiment: "positive" | "neutral" | "negative";
 }
 
-interface Drug {
-  name: string;
-}
 
-interface SocialUpdatesProps {
-  drug?: Drug;
-}
 
-const SocialUpdates: React.FC<SocialUpdatesProps> = ({ drug }) => {
+const SocialUpdates= ({ drug }) => {
   const socialUpdates: SocialUpdate[] = drug
     ? [
         {
